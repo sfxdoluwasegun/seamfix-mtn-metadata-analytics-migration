@@ -60,7 +60,9 @@ val count_li = cols_li.length //count_li: Int = 8
 // COMMAND ----------
 
 // Fingerprint de-arraylization with count_fp: Int = 7
-val refined_fp0 = split_column(cols_fp(0), df_fp)
+val refined_fp = df_fp.select("hashID", "kitTag", "location", "fpDeviceType", "fpDuration.$numberLong", "fpNoOfAttempts", "fpProperty", "fpStatus", "fpSuccess", "fpValue", "uniqueId")
+val init_fp = refined_fp.select($"hashID", $"kitTag", $"location", $"fpDeviceType", col("$numberLong").alias("fpDuration"), $"fpNoOfAttempts", $"fpProperty", $"fpStatus", $"fpSuccess", $"fpValue", $"uniqueId")
+val refined_fp0 = split_column(cols_fp(0), init_fp)
 val refined_fp0a = refined_fp0.drop(refined_fp0.col(cols_fp(0)))
 val refined_fp1 = split_column(cols_fp(1), refined_fp0a)
 val refined_fp1a = refined_fp1.drop(refined_fp1.col(cols_fp(1)))
@@ -78,7 +80,9 @@ val refined_fp6a = refined_fp6.drop(refined_fp6.col(cols_fp(6)))
 // COMMAND ----------
 
 // LivenessEvents de-arraylization with count_li: Int = 8
-val refined_li0 = split_column(cols_li(0), df_li)
+val refined_li = df_li.select("hashID", "kitTag", "location", "liCountAverage", "liDeviceType", "liDuration.$numberLong", "liProperty", "liStatus", "liSuccess", "liTimestamp", "liValue", "uniqueId")
+val init_li = refined_li.select($"hashID", $"kitTag", $"location", $"liCountAverage", $"liDeviceType", col("$numberLong").alias("liDuration"), $"liProperty", $"liStatus", $"liSuccess", $"liTimestamp", $"liValue", $"uniqueId")
+val refined_li0 = split_column(cols_li(0), init_li)
 val refined_li0a = refined_li0.drop(refined_li0.col(cols_li(0)))
 val refined_li1 = split_column(cols_li(1), refined_li0a)
 val refined_li1a = refined_li1.drop(refined_li1.col(cols_li(1)))
