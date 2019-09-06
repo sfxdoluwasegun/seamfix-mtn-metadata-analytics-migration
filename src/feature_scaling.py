@@ -35,15 +35,14 @@ usecase_df = spark.read.json("s3n://seamfix-machine-learning/mtn_xmlmetadata/use
 
 # COMMAND ----------
 
-def get_name(df: DataFrame) -> str:
+def get_df_name(df: DataFrame) -> str:
     col_name =[x for x in globals() if globals()[x] is df][0]
     return col_name
 
 def get_unique_items(df: DataFrame):
-  print("\n{} DataFrame \n".format(get_name(df)))
+  print("\n{} DataFrame \n".format(get_df_name(df)))
   for column in df.columns:
     print("{} - {}".format(column, df.toPandas()[column].unique()))
-
 
 # COMMAND ----------
 
@@ -54,7 +53,7 @@ for item in df_list:
 
 # COMMAND ----------
 
-def one_hot_encoder(col_name: str, df: DataFrame) -> DataFrame:
+def encoder(col_name: str, df: DataFrame) -> DataFrame:
   stringIndexer = StringIndexer(inputCol=col_name, outputCol="{}_{}".format(col_name, "doub"))
   decimalModel = stringIndexer.fit(df)
   str_double = decimalModel.transform(df)
@@ -62,23 +61,66 @@ def one_hot_encoder(col_name: str, df: DataFrame) -> DataFrame:
   ohe = encoder.transform(str_double)
   
   onehotEncoderPath = temp_path + "/onehot-encoder"
-  encoder.save(onehotEncoderPath)
+#   encoder.save(onehotEncoderPath)
+  encoder.write().overwrite().save(onehotEncoderPath)
   
   stringIndexerPath = temp_path + "/ohe-model"
-  stringIndexer.save(stringIndexerPath)
+#   stringIndexer.save(stringIndexerPath)
+  stringIndexer.write().overwrite().save(stringIndexerPath)
   return str_double, ohe
 
-# COMMAND ----------
 
-df.select(df.columns[-2]).show()
 
 # COMMAND ----------
 
-# df1, df2 = one_hot_encoder(portrait_df.columns[5], portrait_df)
-# df.select("ptProperty_idx").show()
+def get_column_idx(df: DataFrame, column_name: str) -> str:
+  for (col, i) in zip(df.columns, range(len(df.columns))):
+    if col == column_name:
+      column_idx = "{}.columns[{}]".format(get_df_name(df), i)
+  return column_idx 
+
+# COMMAND ----------
+
+get_column_idx(portrait_df, "location")
+
+
+# COMMAND ----------
+
+df1, df2 = encoder(portrait_df.columns[5], portrait_df)
+
+# COMMAND ----------
+
+stringIndexer = StringIndexer(inputCol=portrait_df.columns[5], outputCol="{}_{}".format(portrait_df.columns[5], "doub"))
+decimalModel = stringIndexer.fit(fingerprints_df)
+str_double = decimalModel.transform(fingerprints_df)
+
+# COMMAND ----------
+
+type(stringIndexer) #pyspark.ml.feature.StringIndexer
+type(decimalModel) #pyspark.ml.feature.StringIndexerModel
+type(str_double) #pyspark.sql.dataframe.DataFrame
+
+# COMMAND ----------
+
+# def reverse_encoder() 
 stringIndexerPath = temp_path + "/ohe-model"
-stringIndexer = StringIndexer.load(stringIndexerPath)
-convertor = IndexToString(inputCol='df.columns[-2]', outputCol='predictedLabel', labels=stringIndexer.labels)
+loadedIndexer = StringIndexer.load(stringIndexerPath)
+decimalModel = loadedIndexer.fit(usecase_df)
+str_double = decimalModel.transform(usecase_df)
+
+
+
+# convertor = IndexToString(inputCol='df.columns[-2]', outputCol='predictedLabel', labels=stringIndexer.labels)
+
+# COMMAND ----------
+
+liveliness_df.select(liveliness_df.columns[-1]).show()
+
+# COMMAND ----------
+
+# type(loadedIndexer) #pyspark.ml.feature.StringIndexer
+# type(decimalModel) #pyspark.ml.feature.StringIndexerModel
+# type(str_double) #pyspark.sql.dataframe.DataFrame
 
 # COMMAND ----------
 
