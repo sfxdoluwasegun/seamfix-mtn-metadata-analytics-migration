@@ -1,0 +1,136 @@
+import pandas as pd
+import copy
+
+## Running this code one time will use up your system's entire memory and might cause it to freeze.
+## I advise you run the code in bits like I have suggested in the code
+
+if __name__ == '__main__':
+    df1 = pd.read_csv('part1.csv', low_memory=False)
+    #check if there is any capture date column in the dataset
+    capture_date_col = df1.columns[df1.columns.str.contains(pat='capture')]
+    capture_date_col.tolist()
+    # fetch all the fingerprint columns in the dataset
+    fp_cols = df1.filter(regex='METRIC_DATA_metricBreakdowns_fingerprints_fingerprint_*', axis=1).columns
+    other = ['_id_$oid', 'METRIC_DATA_uniqueId', 'METRIC_DATA_location', 'METRIC_DATA_kitTag']
+    other_df = df1[other]
+    fp_df = df1[fp_cols]
+    #create ID columns for both datasets to enable me merge them into one
+    other_df['ID'] = range(0, len(other_df))
+    fp_df['ID'] = range(0, len(fp_df))
+    # merge all fingerprint properties together
+    fp_part1 = pd.merge(other_df, fp_df, on='ID', how='inner')
+    #download to local
+    fp_part1.to_csv('fingerprintdf1.csv', index=False)
+
+    df2a = pd.read_csv('part2a.csv', low_memory=False)
+    #check if there is any capture date column in the dataset
+    capture_date_col = df2a.columns[df2a.columns.str.contains(pat='capture')]
+    capture_date_col.tolist()
+    # fetch all the fingerprint columns in the dataset
+    fp_cols = df2a.filter(regex='METRIC_DATA_metricBreakdowns_fingerprints_fingerprint_*', axis=1).columns
+    other = ['_id_$oid', 'METRIC_DATA_uniqueId', 'METRIC_DATA_location', 'METRIC_DATA_kitTag']
+    other_df = df2a[other]
+    fp_df = df2a[fp_cols]
+    #create ID columns for both datasets to enable me merge them into one
+    other_df['ID'] = range(0, len(other_df))
+    fp_df['ID'] = range(0, len(fp_df))
+    # merge all fingerprint properties together
+    fp_part2a = pd.merge(other_df, fp_df, on='ID', how='inner')
+    #download to local
+    fp_part2a.to_csv('fingerprintdf2a.csv', index=False)
+
+    df2b = pd.read_csv('part2b.csv', low_memory=False)
+    # check if there is any capture date column in the dataset
+    capture_date_col = df2b.columns[df2b.columns.str.contains(pat='capture')]
+    capture_date_col.tolist()
+    # fetch all the fingerprint columns in the dataset
+    fp_cols = df2b.filter(regex='METRIC_DATA_metricBreakdowns_fingerprints_fingerprint_*', axis=1).columns
+    other = ['_id_$oid', 'METRIC_DATA_uniqueId', 'METRIC_DATA_location', 'METRIC_DATA_kitTag']
+    other_df = df2b[other]
+    fp_df = df2b[fp_cols]
+    # create ID columns for both datasets to enable me merge them into one
+    other_df['ID'] = range(0, len(other_df))
+    fp_df['ID'] = range(0, len(fp_df))
+    # merge all fingerprint properties together
+    fp_part2b = pd.merge(other_df, fp_df, on='ID', how='inner')
+    # download to local
+    fp_part2b.to_csv('fingerprintdf2b.csv', index=False)
+
+    ###############################################################################################################
+    ########################## This should preferably be done in a separate notebook ##############################
+    ###############################################################################################################
+
+    df1 = pd.read_csv("fingerprintDF1.csv", low_memory=False)
+    df2 = pd.read_csv("fingerprintdf2a.csv", low_memory=False)
+    df3 = pd.read_csv("fingerprintdf2b.csv", low_memory=False)
+
+    print('The shape of df1 is: ', format(df1.shape))
+    print('The shape of df2 is: ', format(df2.shape))
+    print('The shape of df3 is: ', format(df3.shape))
+
+    dataframes = [df1, df2, df3]
+    df = pd.concat(dataframes, sort=False)
+
+    #pd.set_option('display.max_columns', 4500)
+    #pd.set_option('display.max_rows', 4500)
+    #all_fp.isnull().sum().sort_values()
+
+    #df.to_csv('fp_dataset.csv', index=False) <--- optional
+
+    def missing_data_table(df):
+        total = df.isnull().sum().sort_values(ascending=True)
+        percent = (df.isnull().sum() / df.isnull().count()).sort_values(ascending=True)
+        missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
+        return missing_data
+
+    missing_data_table(df)
+
+    # I am renaming column names because they are too long
+    column_names = []
+    cols = df2.columns.tolist()
+    for col in cols:
+        pattern = "METRIC_DATA_metricBreakdowns_fingerprints_"
+        if pattern in col:
+            column_names.append(col[42:])
+        else:
+            column_names.append(col)
+
+    df2.set_axis(column_names, axis=1, inplace=True)
+
+    # I am now taking out the duration and number of attempts columns
+    selected = []
+    cols = df2.columns.tolist()
+    for col in cols:
+        if 'duration' in col:
+            selected.append(col)
+        elif 'noOfAttempts' in col:
+            selected.append(col)
+        else:
+            pass
+
+    features = df2[selected]
+    features['ID'] = range(0, len(features)) #I added the ID so I can identify the non null columns when I merge them with the original dataset
+    features.dropna(inplace=True)
+
+    #features.describe().transpose()
+
+    features['fingerprint_0_attempts_0_duration_$numberLong'] = (
+            features['fingerprint_0_attempts_0_duration_$numberLong'] / 1000)
+    features.loc[:, 'fingerprint_1_attempts_0_duration_$numberLong'] = (
+                features['fingerprint_1_attempts_0_duration_$numberLong'] / 1000)
+    features.loc[:, 'fingerprint_2_attempts_0_duration_$numberLong'] = (
+                features['fingerprint_2_attempts_0_duration_$numberLong'] / 1000)
+    features.loc[:, 'fingerprint_3_attempts_0_duration_$numberLong'] = (
+                features['fingerprint_3_attempts_0_duration_$numberLong'] / 1000)
+
+    #features.describe().transpose()
+
+
+
+
+
+
+
+
+
+
