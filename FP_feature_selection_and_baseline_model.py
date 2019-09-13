@@ -370,7 +370,7 @@ device_cols
 df2a.isnull().values.sum()
 
 
-# In[45]:
+# In[44]:
 
 
 def fill_device_cols(dataframe, columns):
@@ -381,19 +381,19 @@ def fill_device_cols(dataframe, columns):
 fill_empty(df2a, device_cols)
 
 
-# In[47]:
+# In[45]:
 
 
 device_options = df2a.fingerprint_2_attempts_0_deviceType.unique().tolist()
 
 
-# In[48]:
+# In[46]:
 
 
 device_options
 
 
-# In[49]:
+# In[47]:
 
 
 device_dict = {0.12: 0,
@@ -406,6 +406,138 @@ device_dict = {0.12: 0,
  'FS90': 7,
  'FS88': 8,
  'Futronic': 9}
+
+
+# In[48]:
+
+
+def replace_deviceTypes():
+    for col in device_cols:
+         df2a[col] = df2a[col].replace(device_dict)
+        
+replace_deviceTypes()
+
+
+# In[49]:
+
+
+df2a.head()
+
+
+# In[50]:
+
+
+#Normalizing the columns in the dataset
+X = StandardScaler().fit_transform(df2a)
+
+
+# In[51]:
+
+
+X.dtype
+
+
+# In[52]:
+
+
+X
+
+
+# In[53]:
+
+
+from sklearn import decomposition
+
+
+# In[56]:
+
+
+pca = decomposition.PCA(n_components= 70)
+
+
+# In[55]:
+
+
+#df2a.shape
+
+
+# In[57]:
+
+
+fin = pca.fit_transform(X)
+
+
+# In[58]:
+
+
+fin
+
+
+# In[59]:
+
+
+#Determining the optimal number of clusters using the elbow method
+sum_squared_distances = []
+K = range(1,20)
+for k in K:
+    km = KMeans(n_clusters = k)
+    km = km.fit(fin)
+    sum_squared_distances.append(km.inertia_)
+
+
+# In[60]:
+
+
+plt.plot(K, sum_squared_distances, 'bx-')
+plt.xlabel('k')
+plt.ylabel('Sum_of_squared_distances')
+plt.title('Elbow Method For Optimal k')
+plt.show()
+
+
+# In[61]:
+
+
+start = time.time()
+
+kmeans = KMeans(n_clusters=5, verbose = 2)
+model = kmeans.fit(fin)
+
+end = time.time()
+execution_time = end - start
+
+print('Total execution time: ', format(execution_time))
+print("model\n", model)
+
+
+# In[62]:
+
+
+labels = model.labels_
+
+
+# In[65]:
+
+
+df2 = df2[pd.notnull(df2['fingerprint_0_type'])]
+
+
+# In[66]:
+
+
+df2['KM_Clusters'] = labels
+
+
+# In[67]:
+
+
+df2.head()
+
+
+# In[68]:
+
+
+df2.KM_Clusters.unique()
 
 
 # In[ ]:
