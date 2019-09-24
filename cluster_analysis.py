@@ -9,8 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 get_ipython().run_line_magic('matplotlib', 'inline')
-import plotly
-import cufflinks
 pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 120)
 
@@ -418,6 +416,898 @@ sns.catplot(x = 'fingerprint_1_attempts_0_duration_$numberLong' , y = 'fingerpri
 sns.catplot(x = 'fingerprint_1_attempts_0_duration_$numberLong' , y = 'fingerprint_1_attempts_0_deviceType', 
            hue = 'fingerprint_1_attempts_0_attemptBreakdowns_1_success', row = 'fingerprint_1_attempts_0_attemptBreakdowns_1_property',
            data = cluster_1, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[55]:
+
+
+sns.countplot(x = 'fingerprint_1_attempts_0_attemptBreakdowns_0_property', hue = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success', data = cluster_1, orient = 'h', palette = 'deep', dodge = True)
+
+
+# In[56]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_1, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[57]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_1[cluster_1['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[58]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_1[cluster_1['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# # Cluster 2 Analysis
+
+# In[59]:
+
+
+cluster_2 = df[df['KM_Clusters'] == 2]
+
+
+# In[60]:
+
+
+cluster_2.head()
+
+
+# In[61]:
+
+
+cluster_2.shape
+
+
+# In[62]:
+
+
+cluster_2.describe()
+
+
+# In[63]:
+
+
+#cluster_2 dataframe
+print('Success Rate of fingerprint 0 (first attempt):\n ', format(cluster_2['fingerprint_0_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 1 (first attempt):\n ', format(cluster_2['fingerprint_1_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 2 (first attempt):\n ', format(cluster_2['fingerprint_2_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 3 (first attempt):\n ', format(cluster_2['fingerprint_3_attempts_0_status'].value_counts()))
+
+
+# In[64]:
+
+
+print(cluster_2['fingerprint_0_type'].unique())
+print(cluster_2['fingerprint_1_type'].unique())
+print(cluster_2['fingerprint_2_type'].unique())
+print(cluster_2['fingerprint_3_type'].unique())
+
+
+# In[65]:
+
+
+cluster_2.METRIC_DATA_location.unique()
+
+
+# In[66]:
+
+
+len(cluster_2.METRIC_DATA_location.unique())
+
+
+# In[67]:
+
+
+cluster_2_kittags = cluster_2.METRIC_DATA_kitTag.unique()
+
+
+# In[68]:
+
+
+cluster_2_kittags
+
+
+# In[69]:
+
+
+len(cluster_2_kittags)
+
+
+# In[70]:
+
+
+sns.catplot(x = 'fingerprint_0_attempts_0_duration_$numberLong' , y = 'fingerprint_0_attempts_0_deviceType', 
+           hue = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_0_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_2, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[71]:
+
+
+sns.catplot(x = 'fingerprint_1_attempts_0_duration_$numberLong' , y = 'fingerprint_1_attempts_0_deviceType', 
+           hue = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_1_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_2, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[158]:
+
+
+sns.catplot(x = 'fingerprint_2_attempts_0_duration_$numberLong' , y = 'fingerprint_2_attempts_0_deviceType', 
+           hue = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_2_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_2, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[73]:
+
+
+#An attempt at a better plot
+sns.catplot(x = 'fingerprint_3_attempts_0_duration_$numberLong' , y = 'fingerprint_3_attempts_0_deviceType', 
+           hue = 'fingerprint_3_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_3_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_2, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[74]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[75]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[76]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[77]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[78]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[79]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[80]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[81]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_2, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[82]:
+
+
+cluster_2.groupby(['fingerprint_0_attempts_0_attemptBreakdowns_1_property'])['fingerprint_0_attempts_0_attemptBreakdowns_1_success'].value_counts()
+
+
+# In[83]:
+
+
+cluster_2.groupby(['fingerprint_1_attempts_0_attemptBreakdowns_1_property'])['fingerprint_1_attempts_0_attemptBreakdowns_1_success'].value_counts()
+
+
+# In[84]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_0_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[85]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[86]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[87]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_3_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[88]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_0_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[89]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[90]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[91]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_2[cluster_2['fingerprint_3_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# # Cluster 3 Analysis
+
+# In[92]:
+
+
+cluster_3 = df[df['KM_Clusters'] == 3]
+
+
+# In[93]:
+
+
+cluster_3.shape
+
+
+# In[94]:
+
+
+cluster_3.head()
+
+
+# In[95]:
+
+
+cluster_3.describe()
+
+
+# In[96]:
+
+
+print('Success Rate of fingerprint 0 (first attempt):\n ', format(cluster_3['fingerprint_0_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 1 (first attempt):\n ', format(cluster_3['fingerprint_1_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 2 (first attempt):\n ', format(cluster_3['fingerprint_2_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 3 (first attempt):\n ', format(cluster_3['fingerprint_3_attempts_0_status'].value_counts()))
+
+
+# In[97]:
+
+
+print(cluster_3['fingerprint_0_type'].unique())
+print(cluster_3['fingerprint_1_type'].unique())
+print(cluster_3['fingerprint_2_type'].unique())
+print(cluster_3['fingerprint_3_type'].unique())
+
+
+# In[98]:
+
+
+cluster_3.METRIC_DATA_location.unique()
+
+
+# In[99]:
+
+
+len(cluster_3.METRIC_DATA_location.unique())
+
+
+# In[100]:
+
+
+cluster_3_kittags = cluster_3.METRIC_DATA_kitTag.unique()
+
+
+# In[101]:
+
+
+len(cluster_3_kittags)
+
+
+# In[102]:
+
+
+sns.catplot(x = 'fingerprint_0_attempts_0_duration_$numberLong' , y = 'fingerprint_0_attempts_0_deviceType', 
+           hue = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_0_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_3, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[103]:
+
+
+sns.catplot(x = 'fingerprint_1_attempts_0_duration_$numberLong' , y = 'fingerprint_1_attempts_0_deviceType', 
+           hue = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_1_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_3, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[104]:
+
+
+sns.catplot(x = 'fingerprint_2_attempts_0_duration_$numberLong' , y = 'fingerprint_2_attempts_0_deviceType', 
+           hue = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_2_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_3, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[105]:
+
+
+sns.catplot(x = 'fingerprint_3_attempts_0_duration_$numberLong' , y = 'fingerprint_3_attempts_0_deviceType', 
+           hue = 'fingerprint_3_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_3_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_3, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[106]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[107]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[108]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[109]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[110]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[111]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[112]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[113]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_3, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[114]:
+
+
+cluster_3.groupby(['fingerprint_0_attempts_0_attemptBreakdowns_1_property'])['fingerprint_0_attempts_0_attemptBreakdowns_1_success'].value_counts()
+
+
+# In[115]:
+
+
+cluster_3.groupby(['fingerprint_1_attempts_0_attemptBreakdowns_1_property'])['fingerprint_1_attempts_0_attemptBreakdowns_1_success'].value_counts()
+
+
+# In[116]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_0_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[117]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[118]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[119]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_3_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[120]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_0_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[121]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[122]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[123]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_3[cluster_3['fingerprint_3_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# # Cluster 4 Analysis
+
+# In[124]:
+
+
+cluster_4 = df[df['KM_Clusters'] == 4]
+
+
+# In[125]:
+
+
+cluster_4.shape
+
+
+# In[126]:
+
+
+cluster_4.describe()
+
+
+# In[127]:
+
+
+cluster_4.head()
+
+
+# In[128]:
+
+
+print('Success Rate of fingerprint 0 (first attempt):\n ', format(cluster_4['fingerprint_0_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 1 (first attempt):\n ', format(cluster_4['fingerprint_1_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 2 (first attempt):\n ', format(cluster_4['fingerprint_2_attempts_0_status'].value_counts()))
+print('Success Rate of fingerprint 3 (first attempt):\n ', format(cluster_4['fingerprint_3_attempts_0_status'].value_counts()))
+
+
+# In[129]:
+
+
+print(cluster_4['fingerprint_0_type'].unique())
+print(cluster_4['fingerprint_1_type'].unique())
+print(cluster_4['fingerprint_2_type'].unique())
+print(cluster_4['fingerprint_3_type'].unique())
+
+
+# In[130]:
+
+
+cluster_4.METRIC_DATA_location.unique()
+
+
+# In[131]:
+
+
+len(cluster_4.METRIC_DATA_location.unique())
+
+
+# In[132]:
+
+
+len(df.METRIC_DATA_location.unique())
+
+
+# In[133]:
+
+
+cluster_4_kittags = cluster_4.METRIC_DATA_kitTag.unique()
+
+
+# In[134]:
+
+
+len(cluster_4_kittags)
+
+
+# In[135]:
+
+
+sns.catplot(x = 'fingerprint_0_attempts_0_duration_$numberLong' , y = 'fingerprint_0_attempts_0_deviceType', 
+           hue = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_0_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_4, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[136]:
+
+
+sns.catplot(x = 'fingerprint_1_attempts_0_duration_$numberLong' , y = 'fingerprint_1_attempts_0_deviceType', 
+           hue = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_1_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_4, orient = 'h', height = 3, aspect = 3, palette = 'bright', kind = 'violin', dodge = True, bw = 2)
+
+
+# In[137]:
+
+
+sns.catplot(x = 'fingerprint_2_attempts_0_duration_$numberLong' , y = 'fingerprint_2_attempts_0_deviceType', 
+           hue = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_2_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_4, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[138]:
+
+
+sns.catplot(x = 'fingerprint_2_attempts_0_duration_$numberLong' , y = 'fingerprint_2_attempts_0_deviceType', 
+           hue = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success', row = 'fingerprint_2_attempts_0_attemptBreakdowns_0_property',
+           data = cluster_4, orient = 'h', height = 3, aspect = 4, palette = 'bright', kind = 'bar', dodge = True)
+
+
+# In[139]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[140]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[141]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[142]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_0_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[143]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_3_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[144]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_2_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[145]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_1_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[146]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', col = 'fingerprint_0_attempts_0_attemptBreakdowns_1_success',
+           data = cluster_4, height = 6, aspect = 1, palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[147]:
+
+
+cluster_4.groupby(['fingerprint_0_attempts_0_attemptBreakdowns_1_property'])['fingerprint_0_attempts_0_attemptBreakdowns_1_success'].count()
+
+
+# In[148]:
+
+
+cluster_4.groupby(['fingerprint_1_attempts_0_attemptBreakdowns_1_property'])['fingerprint_1_attempts_0_attemptBreakdowns_1_success'].count()
+
+
+# In[149]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_0_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[150]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[151]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[152]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_0_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_3_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[153]:
+
+
+ax = sns.catplot('fingerprint_0_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_0_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_0_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[154]:
+
+
+ax = sns.catplot('fingerprint_1_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_1_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_1_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[155]:
+
+
+ax = sns.catplot('fingerprint_2_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_2_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_2_attempts_0_attemptBreakdowns_0_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
+
+
+# In[156]:
+
+
+ax = sns.catplot('fingerprint_3_attempts_0_attemptBreakdowns_1_property', row = 'fingerprint_3_attempts_0_deviceType',
+                 data = cluster_4[cluster_4['fingerprint_3_attempts_0_attemptBreakdowns_1_success'] == False], height = 4, aspect = 1, 
+                 palette = 'deep', kind = 'count', dodge = False)
+ax.set_xticklabels( rotation= 45, ha="right", fontsize = 10)
+plt.tight_layout()
+plt.show()
 
 
 # In[ ]:
