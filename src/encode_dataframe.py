@@ -7,6 +7,7 @@ from pyspark.sql.types import DoubleType, IntegerType
 from pyspark.ml import Pipeline
 from functools import reduce
 
+
 # COMMAND ----------
 
 BUCKET_NAME = "seamfix-machine-learning"
@@ -71,8 +72,12 @@ def str_double(df: DataFrame, col_list: list) -> DataFrame:
 
 ptStr_cols, ptNum_cols, ptBool_cols = sort_columns(pt_df)
 ucStr_cols, ucNum_cols, ucBool_cols = sort_columns(uc_df)
-liStr_cols, liNum_cols, liBool_cols = sort_columns(li_df)
 fpStr_cols, fpNum_cols, fpBool_cols = sort_columns(fp_df)
+
+# COMMAND ----------
+
+fp_df = str_double(fp_df, fpNum_cols)
+fp_df = encode(fp_df, fpStr_cols)
 
 # COMMAND ----------
 
@@ -86,22 +91,65 @@ uc_df = encode(uc_df, ucStr_cols)
 
 # COMMAND ----------
 
+fp_df.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/fingerprint_encoded")
 uc_df.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/useCase_encoded")
 pt_df.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/portrait_encoded")
 
 # COMMAND ----------
 
-li_df = str_double(li_df, liNum_cols)
-li_df = encode(li_df, liStr_cols)
+cols_a = li_df.columns[:len(li_df.columns)//2] 
+cols_b = li_df.columns[len(li_df.columns)//2:] 
+li_df_a = li_df.select(cols_a) 
+li_df_b = li_df.select(['hashID'] + cols_b) 
 
-# COMMAND ----------
+cols_a1 = li_df_a.columns[:len(li_df_a.columns)//2] 
+cols_a2 = li_df_a.columns[len(li_df_a.columns)//2:] 
+cols_b1 = li_df_b.columns[:len(li_df_b.columns)//2] 
+cols_b2 = li_df_b.columns[len(li_df_b.columns)//2:] 
+li_df_a1 = li_df_a.select(cols_a1) 
+li_df_a2 = li_df_a.select(['hashID'] + cols_a2) 
+li_df_b1 = li_df_b.select(cols_b1) 
+li_df_b2 = li_df_b.select(['hashID'] + cols_b2) 
 
-fp_df = str_double(fp_df, fpNum_cols)
-fp_df = encode(fp_df, fpStr_cols)
+liStr_cols_a1, liNum_cols_a1, liBool_cols_a1 = sort_columns(li_df_a1)
+liStr_cols_a2, liNum_cols_a2, liBool_cols_a2 = sort_columns(li_df_a2)
+liStr_cols_b1, liNum_cols_b1, liBool_cols_b1 = sort_columns(li_df_b1)
+liStr_cols_b2, liNum_cols_b2, liBool_cols_b2 = sort_columns(li_df_b2)
 
-# COMMAND ----------
+li_df_a1 = str_double(li_df_a1, liNum_cols_a1)
+li_df_a1 = encode(li_df_a1, liStr_cols_a1)
+li_df_a2 = str_double(li_df_a2, liNum_cols_a2)
+li_df_a2 = encode(li_df_a2, liStr_cols_a2)
+li_df_b1 = str_double(li_df_b1, liNum_cols_b1)
+li_df_b1 = encode(li_df_b1, liStr_cols_b1)
+li_df_b2 = str_double(li_df_b2, liNum_cols_b2)
+li_df_b2 = encode(li_df_b2, liStr_cols_b2)
 
-li_df.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded")
-fp_df.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/fingerprint_encoded")
+li_df_a1.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part1")
+li_df_a2.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part2")
+li_df_b1.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part3")
+li_df_b2.write.json("s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part4")
+
+
+# # To Load LiveEvents and consolidate it as one dataframe because it was split into parts to enable easy encoding and upload to S3
+# li_path1 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part1/*.json"
+# li_path2 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part2/*.json"
+# li_path3 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part3/*.json"
+# li_path4 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part4/*.json"
+
+# li_df_a1 = spark.read.json(li_path1)
+# li_df_a2 = spark.read.json(li_path2)
+# li_df_b1 = spark.read.json(li_path3)
+# li_df_b2 = spark.read.json(li_path4)
+
+# li_df_a2 = li_df_a2.withColumnRenamed('hashID', 'hashID_')
+# li_df_1 = li_df_a1.join(li_df_a2, li_df_a1.hashID == li_df_a2.hashID_)
+# li_df_1 = li_df_1.drop('hashID_')
+# li_df_b1 = li_df_b1.withColumnRenamed('hashID', 'hashID_')
+# li_df_2 = li_df_1.join(li_df_b1, li_df_1.hashID == li_df_b1.hashID_)
+# li_df_2 = li_df_2.drop('hashID_')
+# li_df_b2 = li_df_b2.withColumnRenamed('hashID', 'hashID_')
+# li_df = li_df_2.join(li_df_b2, li_df_2.hashID == li_df_b2.hashID_)
+# li_df = li_df.drop('hashID_')
 
 
