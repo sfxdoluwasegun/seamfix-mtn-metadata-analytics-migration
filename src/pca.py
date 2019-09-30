@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from pyspark.sql.functions import *
+from pyspark.sql.dataframe import DataFrame
 
 # COMMAND ----------
 
@@ -29,6 +30,37 @@ def create_2D_gaussian(mn, variance, cov, n):
     """Randomly sample points from a two-dimensional Gaussian distribution"""
     np.random.seed(142)
     return np.random.multivariate_normal(np.array([mn, mn]), np.array([[variance, cov], [cov, variance]]), n)
+  
+def join_livenessEvent_dataframe(df1: DataFrame, df2: DataFrame, df3: DataFrame, df4: DataFrame) -> DataFrame:
+  df2 = df2.withColumnRenamed('hashID', 'hashID_')
+  df1 = df1.join(df2, df1.hashID == df2.hashID_)
+  df1 = df1.drop('hashID_')
+  df3 = df3.withColumnRenamed('hashID', 'hashID_')
+  df = df1.join(df3, df1.hashID == df3.hashID_)
+  df = df.drop('hashID_')
+  df4 = df4.withColumnRenamed('hashID', 'hashID_')
+  df = df.join(df4, df.hashID == df4.hashID_)
+  df = df.drop('hashID_')
+  return df
+
+
+def plot(data, x1, x2, startx1, stopx1, stepx1, startx2, stopx2, stepx2):
+  # generate layout and plot data
+  startx1 = int(startx1)
+  startx2 = int(startx2)
+  stopx1= int(stopx1+1)
+  stopx2= int(stopx2+1)
+  fig, ax = prepare_plot(np.arange(startx1, stopx1, stepx1), np.arange(startx2, stopx2, stepx2))
+  ax.set_xlabel(r'Simulated $x_1$ %s'%(x1)), ax.set_ylabel(r'Simulated $x_2$ %s'%(x2))
+  ax.set_xlim(startx1-0.5, stopx1-0.5), ax.set_ylim(startx2-0.5, stopx2-0.5)
+  plt.scatter(data[:,0], data[:,1], s=14**2, c='#d6ebf2', edgecolors='#8cbfd0', alpha=0.75)
+  display(fig)
+  
+def double_cols(df: DataFrame) -> list:
+  columns = df.columns
+  doubles = ["Duration", "Value", "Attempts", "CountAverage"]
+  cols_list = [i for i in columns for j in doubles if j in i]
+  return cols_list  
 
 # COMMAND ----------
 
@@ -38,52 +70,73 @@ data_correlated = create_2D_gaussian(mn=50, variance=1, cov=.9, n=100)
 # COMMAND ----------
 
 establish_conn()
-pt_path_en = "s3://seamfix-machine-learning/mtn_xmlmetadata/portrait_encoded/*.json"
-pt_path_re = "s3://seamfix-machine-learning/mtn_xmlmetadata/portrait_refined/*.json"
+pt_path = "s3://seamfix-machine-learning/mtn_xmlmetadata/portrait_encoded/*.json"
+fp_path = "s3://seamfix-machine-learning/mtn_xmlmetadata/fingerprint_encoded/*.json"
+uc_path = "s3://seamfix-machine-learning/mtn_xmlmetadata/useCase_encoded/*.json"
 
-data_en = spark.read.json(pt_path_en)
-data_re = spark.read.json(pt_path_re)
+li_path1 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part1/*.json"
+li_path2 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part2/*.json"
+li_path3 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part3/*.json"
+li_path4 = "s3://seamfix-machine-learning/mtn_xmlmetadata/livenessEvents_encoded/part4/*.json"
+
+li_df1 = spark.read.json(li_path1)
+li_df2 = spark.read.json(li_path2)
+li_df3 = spark.read.json(li_path3)
+li_df4 = spark.read.json(li_path4)
+
+pt_df = spark.read.json(pt_path)
+fp_df = spark.read.json(fp_path)
+uc_df = spark.read.json(uc_path)
+li_df = join_livenessEvent_dataframe(li_df1, li_df2, li_df3, li_df4)
+
 
 # COMMAND ----------
 
-data_en1, data_en2 = data_en.randomSplit([0.1, 0.9])
+pt_split, _ = pt_df.randomSplit([0.1, 0.9])
+fp_split, _ = fp_df.randomSplit([0.1, 0.9])
+uc_split, _ = uc_df.randomSplit([0.1, 0.9])
+li_split, _ = li_df.randomSplit([0.1, 0.9])
 
 # COMMAND ----------
 
-data_en1.count()
+display(pt_split)
 
 # COMMAND ----------
 
-data_en2.count()
+display(fp_split)
 
 # COMMAND ----------
 
-display(data_en1)
+display(uc_split)
 
 # COMMAND ----------
 
-# generate layout and plot data
-fig, ax = prepare_plot(np.arange(46, 55, 2), np.arange(46, 55, 2))
-ax.set_xlabel(r'Simulated $x_1$ values'), ax.set_ylabel(r'Simulated $x_2$ values')
-ax.set_xlim(45, 54.5), ax.set_ylim(45, 54.5)
-plt.scatter(data_random[:,0], data_random[:,1], s=14**2, c='#d6ebf2', edgecolors='#8cbfd0', alpha=0.75)
-display(fig)
+display(li_df2)
 
 # COMMAND ----------
 
+plot(data_random, "data_randomX1", "data_randomX2", data_random[:,0].min(), data_random[:,0].max(), 2, data_random[:,1].min(), data_random[:,1].max(), 2)
 
-# generate layout and plot data
-fig, ax = prepare_plot(np.arange(46, 55, 2), np.arange(46, 55, 2))
-ax.set_xlabel(r'Simulated $x_1$ values'), ax.set_ylabel(r'Simulated $x_2$ values')
-ax.set_xlim(45.5, 54.5), ax.set_ylim(45.5, 54.5)
-plt.scatter(data_correlated[:,0], data_correlated[:,1], s=14**2, c='#d6ebf2',
-            edgecolors='#8cbfd0', alpha=0.75)
-display(fig)
+# COMMAND ----------
+
+plot(data_correlated, "data_correlatedX1", "data_correlatedX2", data_correlated[:,0].min(), data_correlated[:,0].max(), 2, data_correlated[:,1].min(), data_correlated[:,1].max(), 2)
 
 # COMMAND ----------
 
 # array = np.array(dataPT.select("ptDuration","ptValue").collect())
-array = data_en1.select("ptDuration","ptValue").toPandas().values
+data_pt = pt_split.select(double_cols(pt_split)).toPandas().values
+
+# COMMAND ----------
+
+data_uc = uc_split.select(double_cols(uc_split)).toPandas().values
+
+# COMMAND ----------
+
+data_fp = fp_split.select(double_cols(fp_split)).toPandas().values
+
+# COMMAND ----------
+
+data_li = li_split.select(double_cols(li_split)).toPandas().values
 
 # COMMAND ----------
 
@@ -100,17 +153,6 @@ array_norm = (array - array.mean(axis=0)) / array.std(axis=0)
 
 print "maximum values: %5.3f"% array_norm[:,0].max(), array_norm[:,1].max()
 print "minimun values: %5.3f"% array_norm[:,0].min(), array_norm[:,1].min()
-
-# COMMAND ----------
-
-# generate layout and plot data_en1
-fig, ax = prepare_plot(np.arange(82.789, 9.29717174523, 1), np.arange(-0.560, -0.935171696381, 1))
-ax.set_xlabel(r'Simulated $x_1$ values'), ax.set_ylabel(r'Simulated $x_2$ values')
-ax.set_xlim(81.789, 8.29717174523), ax.set_ylim(-0.460, -0.835171696381)
-plt.scatter(array_norm[:,0], array_norm[:,1], s=14**2, c='#d6ebf2',
-            edgecolors='#8cbfd0', alpha=0.75)
-display(fig)
-
 
 
 # TODO: Replace <FILL IN> with appropriate code
@@ -202,8 +244,6 @@ cov_result = [[   1.00000000e+00, -6.47404710e-04], [-6.47404710e-04, 1.00000000
 Test.assertTrue(np.allclose(cov_result, norm_cov), 'incorrect value for norm_cov')
 
 
-
-# TODO: Replace <FILL IN> with appropriate code
 def estimate_covariance(data):
     """Compute the covariance matrix for a given rdd.
 
