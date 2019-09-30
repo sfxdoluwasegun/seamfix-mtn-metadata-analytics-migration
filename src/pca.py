@@ -243,16 +243,7 @@ Test.assertTrue(np.allclose(cov_result, correlated_cov), 'incorrect value for co
 cov_result = [[   1.00000000e+00, -6.47404710e-04], [-6.47404710e-04, 1.00000000e+00]]
 Test.assertTrue(np.allclose(cov_result, norm_cov), 'incorrect value for norm_cov')
 
-# COMMAND ----------
 
-# MAGIC %md
-# MAGIC ### (1c) Covariance Function
-# MAGIC 
-# MAGIC Next, use the expressions above to write a function to compute the sample covariance matrix for an arbitrary `data` RDD.
-
-# COMMAND ----------
-
-# TODO: Replace <FILL IN> with appropriate code
 def estimate_covariance(data):
     """Compute the covariance matrix for a given rdd.
 
